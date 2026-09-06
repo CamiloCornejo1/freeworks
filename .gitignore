@@ -1,0 +1,28 @@
+# Angular / Node
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+
+# Python / Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+venv/
+.venv/
+env/
+
+# Variables de entorno
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.log
+*.tmp
