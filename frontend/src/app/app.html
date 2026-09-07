@@ -29,6 +29,24 @@
       </div>
 
       <div>
+        <label for="cliente">Cliente</label>
+        <select
+          id="cliente"
+          name="cliente"
+          [(ngModel)]="nuevoProyecto.cliente"
+          required
+        >
+          <option [ngValue]="0" disabled>Seleccione un cliente</option>
+
+          @for (cliente of clientes(); track cliente.id) {
+            <option [ngValue]="cliente.id">
+              {{ cliente.nombre }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div>
         <label for="fechaInicio">Fecha de inicio</label>
         <input
           id="fechaInicio"

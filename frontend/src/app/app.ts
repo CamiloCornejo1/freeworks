@@ -7,6 +7,11 @@ import {
   ProyectoService,
 } from './services/proyecto.service';
 
+import {
+  Cliente,
+  ClienteService,
+} from './services/cliente.service';
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule],
@@ -15,8 +20,10 @@ import {
 })
 export class App implements OnInit {
   private readonly proyectoService = inject(ProyectoService);
+  private readonly clienteService = inject(ClienteService);
 
   proyectos = signal<Proyecto[]>([]);
+  clientes = signal<Cliente[]>([]);
   cargando = signal(true);
   error = signal('');
   mensaje = signal('');
@@ -24,7 +31,7 @@ export class App implements OnInit {
   nuevoProyecto: NuevoProyecto = {
     nombre: '',
     descripcion: '',
-    cliente: 1,
+    cliente: 0,
     fecha_inicio: '',
     fecha_entrega: '',
     estado: 'pendiente',
@@ -33,6 +40,7 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     this.cargarProyectos();
+    this.cargarClientes();
   }
 
   cargarProyectos(): void {
@@ -44,6 +52,17 @@ export class App implements OnInit {
       error: () => {
         this.error.set('No fue posible cargar los proyectos.');
         this.cargando.set(false);
+      },
+    });
+  }
+
+  cargarClientes(): void {
+    this.clienteService.obtenerClientes().subscribe({
+      next: (clientes) => {
+        this.clientes.set(clientes);
+      },
+      error: () => {
+        this.error.set('No fue posible cargar los clientes.');
       },
     });
   }
@@ -60,7 +79,7 @@ export class App implements OnInit {
         this.nuevoProyecto = {
           nombre: '',
           descripcion: '',
-          cliente: 1,
+          cliente: 0,
           fecha_inicio: '',
           fecha_entrega: '',
           estado: 'pendiente',
