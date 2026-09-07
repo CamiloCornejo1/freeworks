@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import generics
 
 from .models import Cliente, Comentario, Entregable, Proyecto
@@ -19,6 +20,7 @@ class ProyectoListCreateView(generics.ListCreateAPIView):
         cliente = self.request.query_params.get('cliente')
         estado = self.request.query_params.get('estado')
         prioridad = self.request.query_params.get('prioridad')
+        busqueda = self.request.query_params.get('busqueda')
 
         if cliente:
             queryset = queryset.filter(cliente_id=cliente)
@@ -28,6 +30,12 @@ class ProyectoListCreateView(generics.ListCreateAPIView):
 
         if prioridad:
             queryset = queryset.filter(prioridad=prioridad)
+
+        if busqueda:
+            queryset = queryset.filter(
+                Q(nombre__icontains=busqueda)
+                | Q(entregables__descripcion__icontains=busqueda)
+            ).distinct()
 
         return queryset
 

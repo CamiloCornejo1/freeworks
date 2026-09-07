@@ -54,6 +54,7 @@ export class App implements OnInit {
     cliente: undefined,
     estado: '',
     prioridad: '',
+    busqueda: '',
   };
 
   nuevoProyecto: NuevoProyecto = {
@@ -109,6 +110,7 @@ export class App implements OnInit {
       cliente: undefined,
       estado: '',
       prioridad: '',
+      busqueda: '',
     };
 
     this.cargarProyectos();
@@ -213,6 +215,50 @@ export class App implements OnInit {
     });
   }
 
+  obtenerEstadoVisual(proyecto: Proyecto): string {
+    if (proyecto.estado === 'completado') {
+      return 'Finalizado';
+    }
+
+    if (proyecto.estado === 'en_progreso') {
+      return 'En progreso';
+    }
+
+    const fechaEntrega = new Date(`${proyecto.fecha_entrega}T23:59:59`);
+    const ahora = new Date();
+
+    if (ahora > fechaEntrega) {
+      return 'Atrasado';
+    }
+
+    return 'Pendiente';
+  }
+
+  obtenerTotalProyectos(): number {
+    return this.proyectos().length;
+  }
+
+  obtenerProyectosEnProgreso(): number {
+    return this.proyectos().filter(
+      (proyecto) =>
+        this.obtenerEstadoVisual(proyecto) === 'En progreso'
+    ).length;
+  }
+
+  obtenerProyectosFinalizados(): number {
+    return this.proyectos().filter(
+      (proyecto) =>
+        this.obtenerEstadoVisual(proyecto) === 'Finalizado'
+    ).length;
+  }
+
+  obtenerProyectosAtrasados(): number {
+    return this.proyectos().filter(
+      (proyecto) =>
+        this.obtenerEstadoVisual(proyecto) === 'Atrasado'
+    ).length;
+  }
+
   seleccionarProyectoEntregables(proyecto: Proyecto): void {
     this.proyectoEntregablesId.set(proyecto.id);
     this.nuevoEntregable.proyecto = proyecto.id;
@@ -252,6 +298,7 @@ export class App implements OnInit {
           this.limpiarFormularioEntregable();
           this.nuevoEntregable.proyecto = proyectoId;
           this.cargarEntregables(proyectoId);
+          this.cargarProyectos();
         },
         error: () => {
           this.error.set('No fue posible crear el entregable.');

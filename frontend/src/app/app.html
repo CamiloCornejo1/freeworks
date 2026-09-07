@@ -5,6 +5,32 @@
   </section>
 
   <section>
+    <h2>Resumen de proyectos</h2>
+
+    <div>
+      <article>
+        <h3>Total</h3>
+        <p>{{ obtenerTotalProyectos() }}</p>
+      </article>
+
+      <article>
+        <h3>En progreso</h3>
+        <p>{{ obtenerProyectosEnProgreso() }}</p>
+      </article>
+
+      <article>
+        <h3>Finalizados</h3>
+        <p>{{ obtenerProyectosFinalizados() }}</p>
+      </article>
+
+      <article>
+        <h3>Atrasados</h3>
+        <p>{{ obtenerProyectosAtrasados() }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section>
     @if (proyectoEditandoId() === null) {
       <h2>Nuevo proyecto</h2>
     } @else {
@@ -124,6 +150,17 @@
 
     <form (ngSubmit)="aplicarFiltros()">
       <div>
+        <label for="filtroBusqueda">Buscar proyecto o entregable</label>
+        <input
+          id="filtroBusqueda"
+          name="filtroBusqueda"
+          type="text"
+          [(ngModel)]="filtros.busqueda"
+          placeholder="Ingrese nombre o descripción"
+        />
+      </div>
+
+      <div>
         <label for="filtroCliente">Cliente</label>
         <select
           id="filtroCliente"
@@ -210,12 +247,17 @@
 
           <p>
             <strong>Estado:</strong>
-            {{ proyecto.estado }}
+            {{ obtenerEstadoVisual(proyecto) }}
           </p>
 
           <p>
             <strong>Prioridad:</strong>
             {{ proyecto.prioridad }}
+          </p>
+
+          <p>
+            <strong>Progreso:</strong>
+            {{ proyecto.progreso }}%
           </p>
 
           <p>

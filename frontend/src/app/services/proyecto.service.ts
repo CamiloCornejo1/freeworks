@@ -15,6 +15,7 @@ export interface Proyecto {
   estado: 'pendiente' | 'en_progreso' | 'completado';
   prioridad: 'alta' | 'media' | 'baja';
   creado_en: string;
+  progreso: number;
 }
 
 export interface NuevoProyecto {
@@ -31,6 +32,7 @@ export interface FiltrosProyecto {
   cliente?: number;
   estado?: string;
   prioridad?: string;
+  busqueda?: string;
 }
 
 @Injectable({
@@ -65,6 +67,13 @@ export class ProyectoService {
       params = params.set(
         'prioridad',
         filtros.prioridad,
+      );
+    }
+
+    if (filtros.busqueda) {
+      params = params.set(
+        'busqueda',
+        filtros.busqueda,
       );
     }
 
