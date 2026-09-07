@@ -119,6 +119,66 @@
     </form>
   </section>
 
+  <section>
+    <h2>Filtrar proyectos</h2>
+
+    <form (ngSubmit)="aplicarFiltros()">
+      <div>
+        <label for="filtroCliente">Cliente</label>
+        <select
+          id="filtroCliente"
+          name="filtroCliente"
+          [(ngModel)]="filtros.cliente"
+        >
+          <option [ngValue]="undefined">Todos</option>
+
+          @for (cliente of clientes(); track cliente.id) {
+            <option [ngValue]="cliente.id">
+              {{ cliente.nombre }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div>
+        <label for="filtroEstado">Estado</label>
+        <select
+          id="filtroEstado"
+          name="filtroEstado"
+          [(ngModel)]="filtros.estado"
+        >
+          <option value="">Todos</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="en_progreso">En progreso</option>
+          <option value="completado">Completado</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="filtroPrioridad">Prioridad</label>
+        <select
+          id="filtroPrioridad"
+          name="filtroPrioridad"
+          [(ngModel)]="filtros.prioridad"
+        >
+          <option value="">Todas</option>
+          <option value="alta">Alta</option>
+          <option value="media">Media</option>
+          <option value="baja">Baja</option>
+        </select>
+      </div>
+
+      <button type="submit">Aplicar filtros</button>
+
+      <button
+        type="button"
+        (click)="limpiarFiltros()"
+      >
+        Limpiar filtros
+      </button>
+    </form>
+  </section>
+
   @if (mensaje()) {
     <p>{{ mensaje() }}</p>
   }
@@ -132,7 +192,7 @@
   }
 
   @if (!cargando() && !error() && proyectos().length === 0) {
-    <p>No existen proyectos registrados.</p>
+    <p>No existen proyectos para los filtros seleccionados.</p>
   }
 
   @if (proyectos().length > 0) {

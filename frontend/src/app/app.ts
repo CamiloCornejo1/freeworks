@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import {
+  FiltrosProyecto,
   NuevoProyecto,
   Proyecto,
   ProyectoService,
@@ -29,6 +30,12 @@ export class App implements OnInit {
   mensaje = signal('');
   proyectoEditandoId = signal<number | null>(null);
 
+  filtros: FiltrosProyecto = {
+    cliente: undefined,
+    estado: '',
+    prioridad: '',
+  };
+
   nuevoProyecto: NuevoProyecto = {
     nombre: '',
     descripcion: '',
@@ -45,7 +52,10 @@ export class App implements OnInit {
   }
 
   cargarProyectos(): void {
-    this.proyectoService.obtenerProyectos().subscribe({
+    this.cargando.set(true);
+    this.error.set('');
+
+    this.proyectoService.obtenerProyectos(this.filtros).subscribe({
       next: (proyectos) => {
         this.proyectos.set(proyectos);
         this.cargando.set(false);
@@ -55,6 +65,20 @@ export class App implements OnInit {
         this.cargando.set(false);
       },
     });
+  }
+
+  aplicarFiltros(): void {
+    this.cargarProyectos();
+  }
+
+  limpiarFiltros(): void {
+    this.filtros = {
+      cliente: undefined,
+      estado: '',
+      prioridad: '',
+    };
+
+    this.cargarProyectos();
   }
 
   cargarClientes(): void {
@@ -73,10 +97,10 @@ export class App implements OnInit {
     this.mensaje.set('');
 
     this.proyectoService.crearProyecto(this.nuevoProyecto).subscribe({
-      next: (proyecto) => {
-        this.proyectos.update((proyectos) => [...proyectos, proyecto]);
+      next: () => {
         this.mensaje.set('Proyecto creado correctamente.');
         this.limpiarFormulario();
+        this.cargarProyectos();
       },
       error: () => {
         this.error.set('No fue posible crear el proyecto.');
@@ -114,17 +138,10 @@ export class App implements OnInit {
     this.proyectoService
       .actualizarProyecto(id, this.nuevoProyecto)
       .subscribe({
-        next: (proyectoActualizado) => {
-          this.proyectos.update((proyectos) =>
-            proyectos.map((proyecto) =>
-              proyecto.id === proyectoActualizado.id
-                ? proyectoActualizado
-                : proyecto,
-            ),
-          );
-
+        next: () => {
           this.mensaje.set('Proyecto actualizado correctamente.');
           this.limpiarFormulario();
+          this.cargarProyectos();
         },
         error: () => {
           this.error.set('No fue posible actualizar el proyecto.');
@@ -138,15 +155,12 @@ export class App implements OnInit {
 
     this.proyectoService.eliminarProyecto(id).subscribe({
       next: () => {
-        this.proyectos.update((proyectos) =>
-          proyectos.filter((proyecto) => proyecto.id !== id),
-        );
-
         if (this.proyectoEditandoId() === id) {
           this.limpiarFormulario();
         }
 
         this.mensaje.set('Proyecto eliminado correctamente.');
+        this.cargarProyectos();
       },
       error: () => {
         this.error.set('No fue posible eliminar el proyecto.');
