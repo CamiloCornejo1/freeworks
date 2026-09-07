@@ -14,6 +14,16 @@ export interface Proyecto {
   creado_en: string;
 }
 
+export interface NuevoProyecto {
+  nombre: string;
+  descripcion: string;
+  cliente: number;
+  fecha_inicio: string;
+  fecha_entrega: string;
+  estado: 'pendiente' | 'en_progreso' | 'completado';
+  prioridad: 'alta' | 'media' | 'baja';
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -23,5 +33,9 @@ export class ProyectoService {
 
   obtenerProyectos(): Observable<Proyecto[]> {
     return this.http.get<Proyecto[]>(this.apiUrl);
+  }
+
+  crearProyecto(proyecto: NuevoProyecto): Observable<Proyecto> {
+    return this.http.post<Proyecto>(this.apiUrl, proyecto);
   }
 }

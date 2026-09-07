@@ -4,6 +4,86 @@
     <p>Panel de gestión de proyectos freelance</p>
   </section>
 
+  <section>
+    <h2>Nuevo proyecto</h2>
+
+    <form (ngSubmit)="crearProyecto()">
+      <div>
+        <label for="nombre">Nombre</label>
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          [(ngModel)]="nuevoProyecto.nombre"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="descripcion">Descripción</label>
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          [(ngModel)]="nuevoProyecto.descripcion"
+        ></textarea>
+      </div>
+
+      <div>
+        <label for="fechaInicio">Fecha de inicio</label>
+        <input
+          id="fechaInicio"
+          name="fechaInicio"
+          type="date"
+          [(ngModel)]="nuevoProyecto.fecha_inicio"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="fechaEntrega">Fecha de entrega</label>
+        <input
+          id="fechaEntrega"
+          name="fechaEntrega"
+          type="date"
+          [(ngModel)]="nuevoProyecto.fecha_entrega"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="estado">Estado</label>
+        <select
+          id="estado"
+          name="estado"
+          [(ngModel)]="nuevoProyecto.estado"
+        >
+          <option value="pendiente">Pendiente</option>
+          <option value="en_progreso">En progreso</option>
+          <option value="completado">Completado</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="prioridad">Prioridad</label>
+        <select
+          id="prioridad"
+          name="prioridad"
+          [(ngModel)]="nuevoProyecto.prioridad"
+        >
+          <option value="alta">Alta</option>
+          <option value="media">Media</option>
+          <option value="baja">Baja</option>
+        </select>
+      </div>
+
+      <button type="submit">Crear proyecto</button>
+    </form>
+  </section>
+
+  @if (mensaje()) {
+    <p>{{ mensaje() }}</p>
+  }
+
   @if (cargando()) {
     <p>Cargando proyectos...</p>
   }
