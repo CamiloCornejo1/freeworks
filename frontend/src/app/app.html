@@ -248,6 +248,13 @@
           >
             Ver entregables
           </button>
+
+          <button
+            type="button"
+            (click)="seleccionarProyectoComentarios(proyecto)"
+          >
+            Ver comentarios
+          </button>
         </article>
       }
     </section>
@@ -332,6 +339,48 @@
             <p>
               <strong>Estado:</strong>
               {{ entregable.estado }}
+            </p>
+          </article>
+        }
+      }
+    </section>
+  }
+
+  @if (proyectoComentariosId() !== null) {
+    <section>
+      <h2>Comentarios del proyecto</h2>
+
+      <form (ngSubmit)="crearComentario()">
+        <div>
+          <label for="comentarioTexto">Comentario</label>
+          <textarea
+            id="comentarioTexto"
+            name="comentarioTexto"
+            [(ngModel)]="nuevoComentario.texto"
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit">Agregar comentario</button>
+      </form>
+
+      @if (comentarios().length === 0) {
+        <p>No existen comentarios para este proyecto.</p>
+      }
+
+      @if (comentarios().length > 0) {
+        <h3>Comentarios registrados</h3>
+
+        @for (comentario of comentarios(); track comentario.id) {
+          <article>
+            <p>
+              <strong>Comentario:</strong>
+              {{ comentario.texto }}
+            </p>
+
+            <p>
+              <strong>Fecha:</strong>
+              {{ comentario.fecha }}
             </p>
           </article>
         }

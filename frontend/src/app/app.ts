@@ -19,6 +19,12 @@ import {
   NuevoEntregable,
 } from './services/entregable.service';
 
+import {
+  Comentario,
+  ComentarioService,
+  NuevoComentario,
+} from './services/comentario.service';
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule],
@@ -29,10 +35,12 @@ export class App implements OnInit {
   private readonly proyectoService = inject(ProyectoService);
   private readonly clienteService = inject(ClienteService);
   private readonly entregableService = inject(EntregableService);
+  private readonly comentarioService = inject(ComentarioService);
 
   proyectos = signal<Proyecto[]>([]);
   clientes = signal<Cliente[]>([]);
   entregables = signal<Entregable[]>([]);
+  comentarios = signal<Comentario[]>([]);
 
   cargando = signal(true);
   error = signal('');
@@ -40,6 +48,7 @@ export class App implements OnInit {
 
   proyectoEditandoId = signal<number | null>(null);
   proyectoEntregablesId = signal<number | null>(null);
+  proyectoComentariosId = signal<number | null>(null);
 
   filtros: FiltrosProyecto = {
     cliente: undefined,
@@ -62,6 +71,11 @@ export class App implements OnInit {
     fecha_entrega: '',
     archivo: '',
     estado: 'pendiente',
+    proyecto: 0,
+  };
+
+  nuevoComentario: NuevoComentario = {
+    texto: '',
     proyecto: 0,
   };
 
@@ -184,6 +198,12 @@ export class App implements OnInit {
           this.limpiarFormularioEntregable();
         }
 
+        if (this.proyectoComentariosId() === id) {
+          this.proyectoComentariosId.set(null);
+          this.comentarios.set([]);
+          this.limpiarFormularioComentario();
+        }
+
         this.mensaje.set('Proyecto eliminado correctamente.');
         this.cargarProyectos();
       },
@@ -239,6 +259,52 @@ export class App implements OnInit {
       });
   }
 
+  seleccionarProyectoComentarios(proyecto: Proyecto): void {
+    this.proyectoComentariosId.set(proyecto.id);
+    this.nuevoComentario.proyecto = proyecto.id;
+    this.cargarComentarios(proyecto.id);
+    this.mensaje.set('');
+    this.error.set('');
+  }
+
+  cargarComentarios(proyectoId: number): void {
+    this.comentarioService.obtenerComentarios(proyectoId).subscribe({
+      next: (comentarios) => {
+        this.comentarios.set(comentarios);
+      },
+      error: () => {
+        this.error.set('No fue posible cargar los comentarios.');
+      },
+    });
+  }
+
+  crearComentario(): void {
+    const proyectoId = this.proyectoComentariosId();
+
+    if (proyectoId === null) {
+      return;
+    }
+
+    this.error.set('');
+    this.mensaje.set('');
+
+    this.nuevoComentario.proyecto = proyectoId;
+
+    this.comentarioService
+      .crearComentario(this.nuevoComentario)
+      .subscribe({
+        next: () => {
+          this.mensaje.set('Comentario creado correctamente.');
+          this.limpiarFormularioComentario();
+          this.nuevoComentario.proyecto = proyectoId;
+          this.cargarComentarios(proyectoId);
+        },
+        error: () => {
+          this.error.set('No fue posible crear el comentario.');
+        },
+      });
+  }
+
   cancelarEdicion(): void {
     this.limpiarFormulario();
     this.mensaje.set('');
@@ -265,6 +331,13 @@ export class App implements OnInit {
       fecha_entrega: '',
       archivo: '',
       estado: 'pendiente',
+      proyecto: 0,
+    };
+  }
+
+  limpiarFormularioComentario(): void {
+    this.nuevoComentario = {
+      texto: '',
       proyecto: 0,
     };
   }

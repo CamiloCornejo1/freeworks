@@ -57,5 +57,14 @@ class EntregableListCreateView(generics.ListCreateAPIView):
 
 
 class ComentarioListCreateView(generics.ListCreateAPIView):
-    queryset = Comentario.objects.all()
     serializer_class = ComentarioSerializer
+
+    def get_queryset(self):
+        queryset = Comentario.objects.all()
+
+        proyecto = self.request.query_params.get('proyecto')
+
+        if proyecto:
+            queryset = queryset.filter(proyecto_id=proyecto)
+
+        return queryset
