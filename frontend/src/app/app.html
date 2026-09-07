@@ -241,7 +241,100 @@
           >
             Eliminar
           </button>
+
+          <button
+            type="button"
+            (click)="seleccionarProyectoEntregables(proyecto)"
+          >
+            Ver entregables
+          </button>
         </article>
+      }
+    </section>
+  }
+
+  @if (proyectoEntregablesId() !== null) {
+    <section>
+      <h2>Entregables del proyecto</h2>
+
+      <form (ngSubmit)="crearEntregable()">
+        <div>
+          <label for="entregableDescripcion">Descripción</label>
+          <textarea
+            id="entregableDescripcion"
+            name="entregableDescripcion"
+            [(ngModel)]="nuevoEntregable.descripcion"
+            required
+          ></textarea>
+        </div>
+
+        <div>
+          <label for="entregableFecha">Fecha de entrega</label>
+          <input
+            id="entregableFecha"
+            name="entregableFecha"
+            type="date"
+            [(ngModel)]="nuevoEntregable.fecha_entrega"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="entregableArchivo">Archivo simulado</label>
+          <input
+            id="entregableArchivo"
+            name="entregableArchivo"
+            type="text"
+            [(ngModel)]="nuevoEntregable.archivo"
+            placeholder="ejemplo.zip"
+          />
+        </div>
+
+        <div>
+          <label for="entregableEstado">Estado</label>
+          <select
+            id="entregableEstado"
+            name="entregableEstado"
+            [(ngModel)]="nuevoEntregable.estado"
+          >
+            <option value="pendiente">Pendiente</option>
+            <option value="entregado">Entregado</option>
+          </select>
+        </div>
+
+        <button type="submit">Crear entregable</button>
+      </form>
+
+      @if (entregables().length === 0) {
+        <p>No existen entregables para este proyecto.</p>
+      }
+
+      @if (entregables().length > 0) {
+        <h3>Entregables registrados</h3>
+
+        @for (entregable of entregables(); track entregable.id) {
+          <article>
+            <p>
+              <strong>Descripción:</strong>
+              {{ entregable.descripcion }}
+            </p>
+
+            <p>
+              <strong>Fecha de entrega:</strong>
+              {{ entregable.fecha_entrega }}
+            </p>
+
+            <p>
+              <strong>Archivo:</strong>
+              {{ entregable.archivo || 'Sin archivo' }}
+            </p>
+
+            <p>
+              <strong>Estado:</strong>
+              {{ entregable.estado }}
+            </p>
+          </article>
+        }
       }
     </section>
   }

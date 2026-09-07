@@ -43,8 +43,17 @@ class ClienteListCreateView(generics.ListCreateAPIView):
 
 
 class EntregableListCreateView(generics.ListCreateAPIView):
-    queryset = Entregable.objects.all()
     serializer_class = EntregableSerializer
+
+    def get_queryset(self):
+        queryset = Entregable.objects.all()
+
+        proyecto = self.request.query_params.get('proyecto')
+
+        if proyecto:
+            queryset = queryset.filter(proyecto_id=proyecto)
+
+        return queryset
 
 
 class ComentarioListCreateView(generics.ListCreateAPIView):

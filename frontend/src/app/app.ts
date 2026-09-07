@@ -13,6 +13,12 @@ import {
   ClienteService,
 } from './services/cliente.service';
 
+import {
+  Entregable,
+  EntregableService,
+  NuevoEntregable,
+} from './services/entregable.service';
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule],
@@ -22,13 +28,18 @@ import {
 export class App implements OnInit {
   private readonly proyectoService = inject(ProyectoService);
   private readonly clienteService = inject(ClienteService);
+  private readonly entregableService = inject(EntregableService);
 
   proyectos = signal<Proyecto[]>([]);
   clientes = signal<Cliente[]>([]);
+  entregables = signal<Entregable[]>([]);
+
   cargando = signal(true);
   error = signal('');
   mensaje = signal('');
+
   proyectoEditandoId = signal<number | null>(null);
+  proyectoEntregablesId = signal<number | null>(null);
 
   filtros: FiltrosProyecto = {
     cliente: undefined,
@@ -44,6 +55,14 @@ export class App implements OnInit {
     fecha_entrega: '',
     estado: 'pendiente',
     prioridad: 'media',
+  };
+
+  nuevoEntregable: NuevoEntregable = {
+    descripcion: '',
+    fecha_entrega: '',
+    archivo: '',
+    estado: 'pendiente',
+    proyecto: 0,
   };
 
   ngOnInit(): void {
@@ -159,6 +178,12 @@ export class App implements OnInit {
           this.limpiarFormulario();
         }
 
+        if (this.proyectoEntregablesId() === id) {
+          this.proyectoEntregablesId.set(null);
+          this.entregables.set([]);
+          this.limpiarFormularioEntregable();
+        }
+
         this.mensaje.set('Proyecto eliminado correctamente.');
         this.cargarProyectos();
       },
@@ -166,6 +191,52 @@ export class App implements OnInit {
         this.error.set('No fue posible eliminar el proyecto.');
       },
     });
+  }
+
+  seleccionarProyectoEntregables(proyecto: Proyecto): void {
+    this.proyectoEntregablesId.set(proyecto.id);
+    this.nuevoEntregable.proyecto = proyecto.id;
+    this.cargarEntregables(proyecto.id);
+    this.mensaje.set('');
+    this.error.set('');
+  }
+
+  cargarEntregables(proyectoId: number): void {
+    this.entregableService.obtenerEntregables(proyectoId).subscribe({
+      next: (entregables) => {
+        this.entregables.set(entregables);
+      },
+      error: () => {
+        this.error.set('No fue posible cargar los entregables.');
+      },
+    });
+  }
+
+  crearEntregable(): void {
+    const proyectoId = this.proyectoEntregablesId();
+
+    if (proyectoId === null) {
+      return;
+    }
+
+    this.error.set('');
+    this.mensaje.set('');
+
+    this.nuevoEntregable.proyecto = proyectoId;
+
+    this.entregableService
+      .crearEntregable(this.nuevoEntregable)
+      .subscribe({
+        next: () => {
+          this.mensaje.set('Entregable creado correctamente.');
+          this.limpiarFormularioEntregable();
+          this.nuevoEntregable.proyecto = proyectoId;
+          this.cargarEntregables(proyectoId);
+        },
+        error: () => {
+          this.error.set('No fue posible crear el entregable.');
+        },
+      });
   }
 
   cancelarEdicion(): void {
@@ -185,6 +256,16 @@ export class App implements OnInit {
       fecha_entrega: '',
       estado: 'pendiente',
       prioridad: 'media',
+    };
+  }
+
+  limpiarFormularioEntregable(): void {
+    this.nuevoEntregable = {
+      descripcion: '',
+      fecha_entrega: '',
+      archivo: '',
+      estado: 'pendiente',
+      proyecto: 0,
     };
   }
 }
