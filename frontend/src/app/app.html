@@ -4,6 +4,45 @@
     <p>Panel de gestión de proyectos freelance</p>
   </section>
 
+  @if (entregablesAtrasados().length > 0) {
+    <section>
+      <h2>Notificaciones</h2>
+
+      <p>
+        <strong>
+          Hay {{ obtenerCantidadEntregablesAtrasados() }}
+          entregable(s) atrasado(s).
+        </strong>
+      </p>
+
+      @for (entregable of entregablesAtrasados(); track entregable.id) {
+        <article>
+          <p>
+            <strong>Entregable:</strong>
+            {{ entregable.descripcion }}
+          </p>
+
+          <p>
+            <strong>Fecha de entrega:</strong>
+            {{ entregable.fecha_entrega }}
+          </p>
+
+          <p>
+            <strong>Estado:</strong>
+            Pendiente
+          </p>
+        </article>
+      }
+    </section>
+  }
+
+  @if (entregablesAtrasados().length === 0) {
+    <section>
+      <h2>Notificaciones</h2>
+      <p>No existen entregas atrasadas.</p>
+    </section>
+  }
+
   <section>
     <h2>Resumen de proyectos</h2>
 

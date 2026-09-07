@@ -41,6 +41,7 @@ export class App implements OnInit {
   clientes = signal<Cliente[]>([]);
   entregables = signal<Entregable[]>([]);
   comentarios = signal<Comentario[]>([]);
+  entregablesAtrasados = signal<Entregable[]>([]);
 
   cargando = signal(true);
   error = signal('');
@@ -83,6 +84,7 @@ export class App implements OnInit {
   ngOnInit(): void {
     this.cargarProyectos();
     this.cargarClientes();
+    this.cargarEntregablesAtrasados();
   }
 
   cargarProyectos(): void {
@@ -125,6 +127,37 @@ export class App implements OnInit {
         this.error.set('No fue posible cargar los clientes.');
       },
     });
+  }
+
+  cargarEntregablesAtrasados(): void {
+    this.entregableService.obtenerEntregables().subscribe({
+      next: (entregables) => {
+        const hoy = new Date();
+
+        const atrasados = entregables.filter((entregable) => {
+          if (entregable.estado !== 'pendiente') {
+            return false;
+          }
+
+          const fechaEntrega = new Date(
+            `${entregable.fecha_entrega}T23:59:59`
+          );
+
+          return hoy > fechaEntrega;
+        });
+
+        this.entregablesAtrasados.set(atrasados);
+      },
+      error: () => {
+        this.error.set(
+          'No fue posible cargar las notificaciones de entregas atrasadas.'
+        );
+      },
+    });
+  }
+
+  obtenerCantidadEntregablesAtrasados(): number {
+    return this.entregablesAtrasados().length;
   }
 
   crearProyecto(): void {
@@ -208,6 +241,7 @@ export class App implements OnInit {
 
         this.mensaje.set('Proyecto eliminado correctamente.');
         this.cargarProyectos();
+        this.cargarEntregablesAtrasados();
       },
       error: () => {
         this.error.set('No fue posible eliminar el proyecto.');
@@ -299,6 +333,7 @@ export class App implements OnInit {
           this.nuevoEntregable.proyecto = proyectoId;
           this.cargarEntregables(proyectoId);
           this.cargarProyectos();
+          this.cargarEntregablesAtrasados();
         },
         error: () => {
           this.error.set('No fue posible crear el entregable.');

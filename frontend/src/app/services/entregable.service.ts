@@ -29,12 +29,16 @@ export class EntregableService {
   private readonly http = inject(HttpClient);
 
   obtenerEntregables(
-    proyectoId: number,
+    proyectoId?: number,
   ): Observable<Entregable[]> {
-    const params = new HttpParams().set(
-      'proyecto',
-      proyectoId.toString(),
-    );
+    let params = new HttpParams();
+
+    if (proyectoId !== undefined) {
+      params = params.set(
+        'proyecto',
+        proyectoId.toString(),
+      );
+    }
 
     return this.http.get<Entregable[]>(
       this.apiUrl,
