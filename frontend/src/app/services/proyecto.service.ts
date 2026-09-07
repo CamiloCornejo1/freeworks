@@ -38,4 +38,20 @@ export class ProyectoService {
   crearProyecto(proyecto: NuevoProyecto): Observable<Proyecto> {
     return this.http.post<Proyecto>(this.apiUrl, proyecto);
   }
+
+  actualizarProyecto(
+    id: number,
+    proyecto: NuevoProyecto,
+  ): Observable<Proyecto> {
+    return this.http.put<Proyecto>(
+      `${this.apiUrl}${id}/`,
+      proyecto,
+    );
+  }
+
+  eliminarProyecto(id: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiUrl}${id}/`,
+    );
+  }
 }

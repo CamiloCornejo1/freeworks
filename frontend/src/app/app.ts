@@ -27,6 +27,7 @@ export class App implements OnInit {
   cargando = signal(true);
   error = signal('');
   mensaje = signal('');
+  proyectoEditandoId = signal<number | null>(null);
 
   nuevoProyecto: NuevoProyecto = {
     nombre: '',
@@ -75,20 +76,101 @@ export class App implements OnInit {
       next: (proyecto) => {
         this.proyectos.update((proyectos) => [...proyectos, proyecto]);
         this.mensaje.set('Proyecto creado correctamente.');
-
-        this.nuevoProyecto = {
-          nombre: '',
-          descripcion: '',
-          cliente: 0,
-          fecha_inicio: '',
-          fecha_entrega: '',
-          estado: 'pendiente',
-          prioridad: 'media',
-        };
+        this.limpiarFormulario();
       },
       error: () => {
         this.error.set('No fue posible crear el proyecto.');
       },
     });
+  }
+
+  editarProyecto(proyecto: Proyecto): void {
+    this.proyectoEditandoId.set(proyecto.id);
+
+    this.nuevoProyecto = {
+      nombre: proyecto.nombre,
+      descripcion: proyecto.descripcion,
+      cliente: proyecto.cliente,
+      fecha_inicio: proyecto.fecha_inicio,
+      fecha_entrega: proyecto.fecha_entrega,
+      estado: proyecto.estado,
+      prioridad: proyecto.prioridad,
+    };
+
+    this.mensaje.set('');
+    this.error.set('');
+  }
+
+  actualizarProyecto(): void {
+    const id = this.proyectoEditandoId();
+
+    if (id === null) {
+      return;
+    }
+
+    this.error.set('');
+    this.mensaje.set('');
+
+    this.proyectoService
+      .actualizarProyecto(id, this.nuevoProyecto)
+      .subscribe({
+        next: (proyectoActualizado) => {
+          this.proyectos.update((proyectos) =>
+            proyectos.map((proyecto) =>
+              proyecto.id === proyectoActualizado.id
+                ? proyectoActualizado
+                : proyecto,
+            ),
+          );
+
+          this.mensaje.set('Proyecto actualizado correctamente.');
+          this.limpiarFormulario();
+        },
+        error: () => {
+          this.error.set('No fue posible actualizar el proyecto.');
+        },
+      });
+  }
+
+  eliminarProyecto(id: number): void {
+    this.error.set('');
+    this.mensaje.set('');
+
+    this.proyectoService.eliminarProyecto(id).subscribe({
+      next: () => {
+        this.proyectos.update((proyectos) =>
+          proyectos.filter((proyecto) => proyecto.id !== id),
+        );
+
+        if (this.proyectoEditandoId() === id) {
+          this.limpiarFormulario();
+        }
+
+        this.mensaje.set('Proyecto eliminado correctamente.');
+      },
+      error: () => {
+        this.error.set('No fue posible eliminar el proyecto.');
+      },
+    });
+  }
+
+  cancelarEdicion(): void {
+    this.limpiarFormulario();
+    this.mensaje.set('');
+    this.error.set('');
+  }
+
+  limpiarFormulario(): void {
+    this.proyectoEditandoId.set(null);
+
+    this.nuevoProyecto = {
+      nombre: '',
+      descripcion: '',
+      cliente: 0,
+      fecha_inicio: '',
+      fecha_entrega: '',
+      estado: 'pendiente',
+      prioridad: 'media',
+    };
   }
 }

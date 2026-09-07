@@ -5,9 +5,19 @@
   </section>
 
   <section>
-    <h2>Nuevo proyecto</h2>
+    @if (proyectoEditandoId() === null) {
+      <h2>Nuevo proyecto</h2>
+    } @else {
+      <h2>Editar proyecto</h2>
+    }
 
-    <form (ngSubmit)="crearProyecto()">
+    <form
+      (ngSubmit)="
+        proyectoEditandoId() === null
+          ? crearProyecto()
+          : actualizarProyecto()
+      "
+    >
       <div>
         <label for="nombre">Nombre</label>
         <input
@@ -94,7 +104,18 @@
         </select>
       </div>
 
-      <button type="submit">Crear proyecto</button>
+      @if (proyectoEditandoId() === null) {
+        <button type="submit">Crear proyecto</button>
+      } @else {
+        <button type="submit">Actualizar proyecto</button>
+
+        <button
+          type="button"
+          (click)="cancelarEdicion()"
+        >
+          Cancelar
+        </button>
+      }
     </form>
   </section>
 
@@ -146,6 +167,20 @@
             <strong>Fecha de entrega:</strong>
             {{ proyecto.fecha_entrega }}
           </p>
+
+          <button
+            type="button"
+            (click)="editarProyecto(proyecto)"
+          >
+            Editar
+          </button>
+
+          <button
+            type="button"
+            (click)="eliminarProyecto(proyecto.id)"
+          >
+            Eliminar
+          </button>
         </article>
       }
     </section>

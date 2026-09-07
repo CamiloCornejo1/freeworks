@@ -1,6 +1,7 @@
 from rest_framework import generics
 
 from .models import Cliente, Comentario, Entregable, Proyecto
+
 from .serializers import (
     ClienteSerializer,
     ComentarioSerializer,
@@ -10,6 +11,11 @@ from .serializers import (
 
 
 class ProyectoListCreateView(generics.ListCreateAPIView):
+    queryset = Proyecto.objects.all()
+    serializer_class = ProyectoSerializer
+
+
+class ProyectoDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Proyecto.objects.all()
     serializer_class = ProyectoSerializer
 
